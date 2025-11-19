@@ -740,7 +740,7 @@ alertmanager:
     ## Port to expose on each node
     ## Only used if service.type is 'NodePort'
     ##
-    nodePort: 30903
+    nodePort: 32004
     ## List of IP addresses at which the Prometheus server service is available
     ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
     ##
@@ -795,7 +795,7 @@ alertmanager:
     ## Port to expose on each node
     ## Only used if servicePerReplica.type is 'NodePort'
     ##
-    nodePort: 30904
+    nodePort: 32005
 
     ## Loadbalancer source IP ranges
     ## Only used if servicePerReplica.type is "LoadBalancer"
@@ -1474,6 +1474,8 @@ grafana:
     portName: http-web
     ipFamilies: []
     ipFamilyPolicy: ""
+    type: NodePort
+    nodePort: 32007
 
   serviceMonitor:
     # If true, a ServiceMonitor CRD is created for a prometheus operator
@@ -3591,7 +3593,7 @@ prometheus:
     ## Port to expose on each node
     ## Only used if service.type is 'NodePort'
     ##
-    nodePort: 30090
+    nodePort: 32006
 
     ## Loadbalancer IP
     ## Only use if service.type is "LoadBalancer"
@@ -3604,7 +3606,7 @@ prometheus:
 
     ## Service type
     ##
-    type: ClusterIP
+    type: NodePort
 
     ## Additional ports to open for Prometheus service
     ##
@@ -4703,10 +4705,10 @@ prometheus:
   #      - nodes/proxy
   #    verbs: [ "get", "list", "watch" ]
 
-  additionalServiceMonitors: []
+  additionalServiceMonitors:
   ## Name of the ServiceMonitor to create
   ##
-  # - name: ""
+    - name: "mongodb-k8s-operator-controller-manager-metrics-monitor"
 
     ## Additional labels to set used for the ServiceMonitorSelector. Together with standard labels from
     ## the chart
@@ -4728,37 +4730,25 @@ prometheus:
 
     ## Label selector for services to which this ServiceMonitor applies
     ##
-    # selector: {}
-      ## Example which selects all services to be monitored
-      ## with label "monitoredby" with values any of "example-service-1" or "example-service-2"
-      # matchExpressions:
-      #   - key: "monitoredby"
-      #     operator: In
-      #     values:
-      #       - example-service-1
-      #       - example-service-2
-
-      ## label selector for services
-      ##
-      # matchLabels: {}
-
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: "mongodb-k8s-operator"
     ## Namespaces from which services are selected
     ##
-    # namespaceSelector:
+      namespaceSelector:
       ## Match any namespace
       ##
       # any: false
 
       ## Explicit list of namespace names to select
       ##
-      # matchNames: []
+        matchNames:
+          - "mongodb-k8s-operator-system"
 
     ## Endpoints of the selected service to be monitored
     ##
-    # endpoints: []
-      ## Name of the endpoint's service port
-      ## Mutually exclusive with targetPort
-      # - port: ""
+      endpoints:
+       - port: "https"
 
       ## Name or number of the endpoint's target port
       ## Mutually exclusive with port
@@ -4766,7 +4756,7 @@ prometheus:
 
       ## File containing bearer token to be used when scraping targets
       ##
-      #   bearerTokenFile: ""
+         bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
       ## Interval at which metrics should be scraped
       ##
@@ -4774,15 +4764,15 @@ prometheus:
 
       ## HTTP path to scrape for metrics
       ##
-      #   path: /metrics
+         path: /metrics
 
       ## HTTP scheme to use for scraping
       ##
-      #   scheme: http
+         scheme: https
 
       ## TLS configuration to use when scraping the endpoint
       ##
-      #   tlsConfig:
+         tlsConfig:
 
           ## Path to the CA file
           ##
@@ -4794,7 +4784,7 @@ prometheus:
 
           ## Skip certificate verification
           ##
-          # insecureSkipVerify: false
+            insecureSkipVerify: true
 
           ## Path to client key file
           ##
