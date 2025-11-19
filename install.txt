@@ -1,0 +1,21 @@
+# Replace Docker images that cannot be pulled
+sudo docker pull k8s.nju.edu.cn/kube-state-metrics/kube-state-metrics:v2.17.0
+sudo docker tag k8s.nju.edu.cn/kube-state-metrics/kube-state-metrics:v2.17.0 registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.17.0
+sudo docker pull k8s.nju.edu.cn/ingress-nginx/kube-webhook-certgen:v1.6.3
+sudo docker tag k8s.nju.edu.cn/ingress-nginx/kube-webhook-certgen:v1.6.3 registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.3
+
+# Helm Steps
+# Add project repository
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm search repo prometheus-community --versions
+
+# Import and set up the 'values.yaml' file
+helm show values prometheus-community/kube-prometheus-stack --version 78.3.2 > values.yaml
+
+# Install or update project
+helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 78.3.2 -n monitoring -f ./values.yaml
+helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n monitoring -f ./values.yaml
+
+# Uninstall project
+helm uninstall kube-prometheus-stack
