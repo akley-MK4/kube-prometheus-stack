@@ -10,7 +10,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update  
 helm search repo prometheus-community --versions
 ```
-2. Select a version and export the value.yaml file to the current directory  
+2. Select a version and export the file 'values.yaml' to the current directory  
 ```console
 helm show values prometheus-community/kube-prometheus-stack --version 78.3.2 > ./values.yaml
 ```
@@ -18,13 +18,13 @@ helm show values prometheus-community/kube-prometheus-stack --version 78.3.2 > .
 ```console
 helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack --version 78.3.2 -n monitoring -f ./values.yaml
 ```
-4. Check the running status of the project, which is installed by default in the sd namespace  
+4. Check the running status of the project, which is installed by default in the namespace 'monitoring' 
 ```console
 helm list -n monitoring
 ```
 
 ## Undeploy
-Delete the project  
+Directly deleting the helm chart project will delete all related resources  
 ```console
 helm uninstall kube-prometheus-stack -n monitoring
 ```
@@ -57,7 +57,7 @@ grafana:
     nodePort: 32007
 ```
 
-## Monitoring metrics
+## Monitoring Metrics
 Prometheus listens to the created ServiceMonitors, which indicate how Prometheus accesses the metrics server.
 1. Create a ServiceMonitor for the specified metrics server in this project.  
 If your environment does not have a ServiceMonitor CRD and you do not want to create it, you can use this method to create the ServiceMonitor in the namespace.
@@ -95,3 +95,5 @@ prometheus:
       matchLabels:
         kubernetes.io/metadata.name: mongodb-k8s-operator-system
 ```
+
+## Import Grafana Dashboards
